@@ -1,0 +1,77 @@
+
+# Plantila generica que definimos, debido a la replicacion que vamos a crear.
+acortador-app: &app
+  build: .
+  environment: &app-env 
+    DB-URL: jdbc://postgresql://pgbouncer:5432/app
+    FLYWAY_URL: jdbc://postgresql//postgres:5432/app
+  depends_on:
+    pgbouncer:
+      condition: service_started
+
+services:
+
+  postgres:
+    image: postgres:18
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASS: app
+
+    ports:
+      - "5432:5432"
+    
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d app"]
+      interval: 2s
+      retries: 30
+
+  pgbouncer:
+    image: edoburu/pgbouncer:v1.26.p0
+    environment:
+      DATABASE_URL: postgres://app:app@postgres:5432/app
+      AUTH_TYPE: scram-sha256
+      POOL_MODE: transaction
+      DEFAULT_POOL_SIZE: 20
+      MAX_CLIENT_CONN: 500
+    ports:
+      - "6432:5432"
+    depends_on:
+      - postgres:
+          condition: service_healthy
+        
+  app1:
+    <<: *app
+    environment:
+      <<: *app-env
+    INSTANCE: app1
+  
+  app2: 
+    <<: *app
+    environment:
+      <<: *app-env
+    INSTANCE: app1
+
+  app3: 
+    <<: *app
+    environment:
+      <<: *app-env
+    INSTANCE: app1
+    SLOW_MS: 222  # Creando lentitud a proposito.
+  
+  nginx:
+    image: nginx:1.3-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - ENABLE_METRICS=true
+    depends_on:
+      - app1
+      - app2
+      - app3
+
+  volumes:
+    pgdata:
