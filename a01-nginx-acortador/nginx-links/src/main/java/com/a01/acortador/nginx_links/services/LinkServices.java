@@ -28,7 +28,8 @@ public class LinkServices implements ILinkService{
 
     @Override
     public Optional<Link> findByCode(String code) {
-        return repository.findByCode(code).orElseThrow(()-> new RuntimeException("No se encontro el link con el codigo: " + code));
+        return repository.findByCode(code);
+
     }
 
     @Override
@@ -46,16 +47,4 @@ public class LinkServices implements ILinkService{
         throw new IllegalStateException("No se encontro un codigo libre en: " + MAX_ATTEMPS + " intentos.");
     }
 
-    @Override
-    public Link update(Link link, String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Override
-    public Link delete(String code) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-    
 }

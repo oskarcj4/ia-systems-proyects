@@ -9,7 +9,7 @@ import jakarta.persistence.Id;
 public class Link {
     @Id 
     @Column(name = "id", updatable = false, nullable = false, length = 7)
-    private String id;
+    private String code;
 
     @Column(nullable = false, length = 2048, unique = true )
     private String url;
@@ -20,18 +20,18 @@ public class Link {
     public Link() {
     }
 
-    public Link(String id, String url, OffsetTime createdAt) {
-        this.id = id;
+    public Link(String code, String url, OffsetTime createdAt) {
+        this.code = code;
         this.url = url;
         this.createdAt = createdAt;
     }
 
-    public String getId() {
-        return id;
+    public String getCode() {
+        return code;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public String getUrl() {
